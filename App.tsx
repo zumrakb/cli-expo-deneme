@@ -1,118 +1,113 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import {Pressable, StyleSheet, Text, View} from 'react-native';
+import React, {Suspense, useState} from 'react';
+import {Canvas} from '@react-three/fiber/native';
+import Model from './src/components/Model';
+import useControls from 'r3f-native-orbitcontrols';
+/* import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../navigator/RootNavigator'; */
+import Trigger from './src/components/Trigger';
+import Loader from './src/components/Loader';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const Model3DScreen = () => {
+  /* const navigation = useNavigation<StackNavigationProp<RootStackParamList>>(); */
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const [OrbitControls, events] = useControls();
+  const [loading, setLoading] = useState<boolean>(false);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.modelContainer} {...events}>
+        {loading && <Loader />}
+        <Canvas>
+          <OrbitControls enablePan={false} />
+          <directionalLight position={[1, 0, 0]} args={['white', 5]} />
+          <directionalLight position={[-1, 0, 0]} args={['white', 5]} />
+          <directionalLight position={[0, 0, 1]} args={['white', 5]} />
+          <directionalLight position={[0, 0, -1]} args={['white', 5]} />
+          <directionalLight position={[0, 1, 0]} args={['white', 5]} />
+          <directionalLight position={[0, -1, 0]} args={['white', 5]} />
+          <Suspense fallback={<Trigger setLoading={setLoading} />}>
+            <Model />
+          </Suspense>
+        </Canvas>
+      </View>
+      <View style={styles.bottomContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.textTitle}>Grey Chair</Text>
+          <Text style={styles.textPrice}>$80.00</Text>
+          <Text style={styles.text}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
+            mattis maximus eros, eu ullamcorper ante ullamcorper a. Phasellus
+            turpis tellus, tempus at feugiat at, facilisis ac sem.
+          </Text>
         </View>
-      </ScrollView>
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={styles.button}
+            onPress={() => {
+              /*  navigation.goBack(); */
+            }}>
+            <Text style={styles.textButton}>Buy Now</Text>
+          </Pressable>
+        </View>
+      </View>
     </SafeAreaView>
   );
-}
+};
+
+export default Model3DScreen;
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: '#F6F7FB',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  modelContainer: {
+    flex: 2,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  bottomContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+    justifyContent: 'space-between',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
-  highlight: {
-    fontWeight: '700',
+  textContainer: {
+    margin: 20,
+    marginBottom: 0,
+  },
+  textTitle: {
+    fontSize: 28,
+    color: '#051E47',
+    fontWeight: 'bold',
+  },
+  textPrice: {
+    fontSize: 28,
+    color: '#3F6900',
+    fontWeight: 'bold',
+  },
+  text: {
+    color: 'black',
+    fontSize: 16,
+    textAlign: 'justify',
+    marginVertical: 10,
+  },
+  buttonContainer: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#3F6900',
+    padding: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 24,
+  },
+  textButton: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
-
-export default App;
